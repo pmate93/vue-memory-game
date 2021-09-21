@@ -1,8 +1,11 @@
 <template>
 
 <div class="card-container">
- <Card v-for="card in cards" :key="card" :cardNumber="card.value" />
+ <Card v-for="card in cards" :key="card.id" 
+ :cardNumber="card.value" 
+ :cardUrl="card.url" />
 </div>
+
 
 </template>
 
@@ -19,8 +22,10 @@ export default {
     return{
       cards: [
         {id: 0},
-        {value: 0}
+        {value: 0},
+        {url: ''}
       ],
+      picUrls: []
     }
   },
 
@@ -49,9 +54,28 @@ export default {
       for (let i = 0; i < arr.length; i++) {
         this.cards.push({
           value: arr[i],
-          id: i
+          id: i,
         })
       }
+    },
+
+    async getPictures(){
+      for(let i = 0 ;i < 6 ; i++){
+      let randomNum = i;
+      await fetch(`https://source.unsplash.com/random?sig=${randomNum}`)
+      .then(res =>{
+        this.picUrls.push(res.url);
+      })
+    }
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < this.cards.length; j++) {
+        if(this.cards[j].value === i){
+          this.cards[j].url = this.picUrls[i];
+        }
+      }
+      
+    }
+    console.log(this.cards);
     }
   },
 
@@ -60,7 +84,7 @@ export default {
 
   created(){
     this.generateCards();
-    console.log(this.cards);
+    this.getPictures();
   }
 }
 </script>
@@ -82,5 +106,6 @@ export default {
   justify-content: center;
   border: 1px solid black;
   flex-wrap: wrap;
+  width:60rem
 }
 </style>
