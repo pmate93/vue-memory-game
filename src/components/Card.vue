@@ -1,17 +1,14 @@
 <template>
-<div class="container">
-  <vue-flip active-click="" >
-            <template v-slot:front class="front">
-              <img :src="this.background">
-            </template>
-            <template v-slot:back class="back">
-              <img :src="this.cardUrl">
-            </template>
-  </vue-flip>
-
-</div>
-
-<!-- <img @click="isClicked" :src="this.clicked ? this.cardUrl : this.background" > -->
+  <div class="container">
+    <vue-flip v-model="isFlipped"  width="auto" height="auto">
+              <template v-slot:front class="front">
+                <img :src="this.background">
+              </template>
+              <template v-slot:back class="back">
+                <img :src="this.cardUrl">
+              </template>
+    </vue-flip>
+  </div>
 </template>
 
 <script>
@@ -23,8 +20,8 @@ export default {
 
   name: 'Card',
   props:{
-      cardNumber: Number,
-      cardUrl: String
+      cardUrl: String,
+      flipped: Boolean
   },
   components: {
     'vue-flip': VueFlip
@@ -32,8 +29,7 @@ export default {
 
   data(){
     return{
-      clicked: false,
-      background: background
+      background: background,
     }
   },
 
@@ -42,8 +38,12 @@ export default {
   },
 
   methods: {
-    isClicked(){
-      this.clicked = !this.clicked;
+
+  },
+
+  computed: {
+    isFlipped:{
+      get() {return this.flipped}
     }
   }
 }
