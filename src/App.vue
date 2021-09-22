@@ -6,17 +6,20 @@
  :flipped="card.flipped"
  @click="isClicked(card.id)" />
 </div>
-
+<PopUp :modal="modal" @changeModal="changeModal" />
 
 </template>
 
 <script>
 import Card from './components/Card.vue';
+import PopUp from './components/PopUp.vue';
 
 export default {
   name: 'App',
+  
   components: {
-    Card
+    Card,
+    PopUp
   },
 
   data(){
@@ -35,13 +38,22 @@ export default {
         second: -1
       },
 
-      clickLimiter: false
+      clickLimiter: false,
+
+      foundCards: [],
+      modal: false
     }
   },
 
   methods:{
+    changeModal(){
+      this.modal = false;
+    },
+
     generateCards(){
       this.cards = [];
+      this.modal = false;
+      this.foundCards = [];
       let arr = [];
 
       while(arr.length < 12){
@@ -73,17 +85,25 @@ export default {
     isClicked(id){
 
       if(!this.clickLimiter){
+
+        for(let i = 0; i < this.foundCards.length; i++){
+          if(this.foundCards[i] === id){
+            return;
+          }
+        }
+
         if(this.previousCards.first === -1){
           this.previousCards.first = id;
-        }else if(this.previousCards.second === -1){
+        }else if(this.previousCards.second === -1 && this.previousCards.first !== id){
           this.previousCards.second = id;
         }
   
         for (let i = 0; i < this.cards.length; i++) {
           if(id === this.cards[i].id){
-            this.cards[i].flipped = !this.cards[i].flipped;
-            console.log(this.cards[i].flipped);
-            break;
+            if(!this.cards[i].flipped){
+              this.cards[i].flipped = true;
+              break;
+            }
           }
         }
   
@@ -93,15 +113,30 @@ export default {
             counter++;
           }
         }
+
         if(counter % 2 === 0){
           this.clickLimiter = true;
-          setTimeout(()=>{
-            this.cards[this.previousCards.first].flipped = false;
-            this.cards[this.previousCards.second].flipped = false;
-            this.previousCards.first = -1;
-            this.previousCards.second = -1;
-            this.clickLimiter = false;
-          }, 1000)
+          if(this.cards[this.previousCards.first].value!==this.cards[this.previousCards.second].value){
+            setTimeout(()=>{
+              this.cards[this.previousCards.first].flipped = false;
+              this.cards[this.previousCards.second].flipped = false;
+              this.previousCards.first = -1;
+              this.previousCards.second = -1;
+              this.clickLimiter = false;
+            }, 1000)
+          }else{
+            setTimeout(()=>{
+              this.foundCards.push(this.previousCards.first, this.previousCards.second);
+              this.previousCards.first = -1;
+              this.previousCards.second = -1;
+              this.clickLimiter = false;
+
+              if(this.foundCards.length === 12){
+                this.modal = true;
+              }
+
+            }, 1000)
+          }
         }
 
       }
