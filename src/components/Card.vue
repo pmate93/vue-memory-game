@@ -57,8 +57,11 @@ img, .container{
   margin:1%;
   padding:1%;
   cursor: pointer;
-  object-fit:cover
+  object-fit:cover;
+  border-radius: 10px;
 }
+
+
 
 @media screen and (max-width: 624px) {
   img, .container {

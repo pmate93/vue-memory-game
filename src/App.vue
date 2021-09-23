@@ -1,7 +1,14 @@
 <template>
-
+<Restart 
+@click="restart"
+/>
 <div class="card-container">
- <Card v-for="card in cards" :key="card.id"  
+  <div v-if="!isLoaded" class="loading-container">
+    <img :src="loading" class="loading">
+    <br>
+    Waiting for cards to load...
+  </div>
+ <Card v-else v-for="card in cards" :key="card.id"  
  :cardUrl="card.url"
  :flipped="card.flipped"
  @click="isClicked(card.id)" />
@@ -13,17 +20,23 @@
 <script>
 import Card from './components/Card.vue';
 import PopUp from './components/PopUp.vue';
+import Restart from './components/Restart.vue';
+import loading from './assets/loading.gif';
+
 
 export default {
   name: 'App',
   
   components: {
     Card,
-    PopUp
+    PopUp,
+    Restart,
   },
 
   data(){
     return{
+      loading: loading,
+      isLoaded: false,
       cards: [
         {id: 0},
         {value: 0},
@@ -50,10 +63,17 @@ export default {
       this.modal = false;
     },
 
+    restart(){
+      this.generateCards();
+      this.getPictures();
+    },
+
     generateCards(){
       this.cards = [];
       this.modal = false;
       this.foundCards = [];
+      this.previousCards.first = -1;
+      this.previousCards.second = -1;
       let arr = [];
 
       while(arr.length < 12){
@@ -118,11 +138,15 @@ export default {
           this.clickLimiter = true;
           if(this.cards[this.previousCards.first].value!==this.cards[this.previousCards.second].value){
             setTimeout(()=>{
-              this.cards[this.previousCards.first].flipped = false;
-              this.cards[this.previousCards.second].flipped = false;
-              this.previousCards.first = -1;
-              this.previousCards.second = -1;
-              this.clickLimiter = false;
+              if (typeof this.cards[this.previousCards.first] !== 'undefined') {
+                this.cards[this.previousCards.first].flipped = false;
+                this.cards[this.previousCards.second].flipped = false;
+                this.previousCards.first = -1;
+                this.previousCards.second = -1;
+                this.clickLimiter = false;
+              }else{
+                this.clickLimiter = false;
+              }
             }, 1000)
           }else{
             setTimeout(()=>{
@@ -144,6 +168,7 @@ export default {
     },
 
     async getPictures(){
+      this.isLoaded = false;
       for(let i = 0 ;i < 6 ; i++){
       
       await fetch(`https://source.unsplash.com/random?sig=${i}`)
@@ -151,6 +176,7 @@ export default {
         this.picUrls.push(res.url);
       })
     }
+    this.isLoaded = true;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < this.cards.length; j++) {
         if(this.cards[j].value === i){
@@ -180,8 +206,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin-top: 60px;
-  display: flex;
-  justify-content: center;
 }
 
 .card-container{
@@ -189,6 +213,23 @@ export default {
   justify-content: center;
   border: 1px solid black;
   flex-wrap: wrap;
-  width:60rem
+  max-width:60rem;
+  min-height:451px;
+  margin:auto;
 }
+
+.front:hover{
+  opacity: 0.9;
+}
+
+.loading-container{
+  text-align: center;
+}
+
+.loading{
+  width:5rem;
+  height: 5rem;
+  margin-top: 11rem;
+}
+
 </style>

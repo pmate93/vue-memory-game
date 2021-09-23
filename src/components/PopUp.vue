@@ -55,7 +55,7 @@ export default {
  
  display: inline-block;
  padding: 15px 25px;
- background-image: linear-gradient(to right, #CC2E5D, #FF5858);
+ background-image: linear-gradient(to right, #2e9b40, #2dd465);
  border-radius: 8px;
  
  color: #FFF;
