@@ -36,4 +36,12 @@ button:hover {
   box-shadow: 6px 6px rgba(0, 0, 0, 0.6);
 }
 
+@media screen and (max-width: 400px) {
+    button{
+        font-size: 15px;
+        padding: 8px 10px;
+    }
+  
+}
+
 </style>

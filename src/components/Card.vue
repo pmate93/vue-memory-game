@@ -63,15 +63,15 @@ img, .container{
 
 
 
-@media screen and (max-width: 624px) {
+@media screen and (max-width: 853px) {
   img, .container {
-    height:4rem;
+    height:4.5rem;
     width:8rem;
 
   }
 }
 
-@media screen and (max-width: 301px) {
+@media screen and (max-width: 451px) {
   img, .container {
     height:3rem;
     width:6rem;

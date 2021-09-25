@@ -1,7 +1,10 @@
 <template>
-<Restart 
-@click="restart"
-/>
+
+<Header 
+:formattedElapsedTime="formattedElapsedTime"
+@restart="restart"
+@updateRange="updateRange" />
+
 <div class="card-container">
   <div v-if="!isLoaded" class="loading-container">
     <img :src="loading" class="loading">
@@ -13,15 +16,20 @@
  :flipped="card.flipped"
  @click="isClicked(card.id)" />
 </div>
-<PopUp :modal="modal" @changeModal="changeModal" />
+<PopUp 
+:modal="modal" 
+@changeModal="changeModal"
+:formattedElapsedTime="formattedElapsedTime"
+/>
 
 </template>
 
 <script>
 import Card from './components/Card.vue';
 import PopUp from './components/PopUp.vue';
-import Restart from './components/Restart.vue';
+
 import loading from './assets/loading.gif';
+import Header from './components/Header.vue';
 
 
 export default {
@@ -30,13 +38,18 @@ export default {
   components: {
     Card,
     PopUp,
-    Restart,
+    Header
   },
 
   data(){
     return{
       loading: loading,
       isLoaded: false,
+      elapsedTime: 0,
+      timer: undefined,
+      range: 12,
+      numberOfCards: 0,
+
       cards: [
         {id: 0},
         {value: 0},
@@ -59,6 +72,10 @@ export default {
   },
 
   methods:{
+    updateRange(rangeOf){
+      this.range = parseInt(rangeOf);
+    },
+
     changeModal(){
       this.modal = false;
     },
@@ -75,11 +92,18 @@ export default {
       this.previousCards.first = -1;
       this.previousCards.second = -1;
       let arr = [];
+      
 
-      while(arr.length < 12){
+      if(this.range % 2 === 0){
+        this.numberOfCards = this.range;
+      }else{
+        this.numberOfCards = this.range - 1;
+      }
+
+      while(arr.length < this.numberOfCards){
         let duplicate = false;
         let counter = 0;
-        let num = Math.floor(Math.random() * 6);
+        let num = Math.floor(Math.random() * this.numberOfCards / 2);
         for(let i = 0; i < arr.length;i++){
           if(arr[i]===num){
             counter++;
@@ -155,8 +179,9 @@ export default {
               this.previousCards.second = -1;
               this.clickLimiter = false;
 
-              if(this.foundCards.length === 12){
+              if(this.foundCards.length === this.numberOfCards){
                 this.modal = true;
+                clearInterval(this.timer);
               }
 
             }, 1000)
@@ -169,27 +194,39 @@ export default {
 
     async getPictures(){
       this.isLoaded = false;
-      for(let i = 0 ;i < 6 ; i++){
+      this.elapsedTime = 0;
+      this.picUrls = [];
+      clearInterval(this.timer);
+
+      for(let i = 0 ; i < this.numberOfCards / 2 ; i++){
       
-      await fetch(`https://source.unsplash.com/random?sig=${i}`)
-      .then(res =>{
-        this.picUrls.push(res.url);
-      })
-    }
-    this.isLoaded = true;
-    for (let i = 0; i < 6; i++) {
-      for (let j = 0; j < this.cards.length; j++) {
-        if(this.cards[j].value === i){
-          this.cards[j].url = this.picUrls[i];
-        }
+        await fetch(`https://source.unsplash.com/random?sig=${i}`)
+        .then(res =>{
+          this.picUrls.push(res.url);
+        })
       }
-      
-    }
-    console.log(this.cards);
+      this.isLoaded = true;
+      for (let i = 0; i < this.numberOfCards / 2; i++) {
+        for (let j = 0; j < this.cards.length; j++) {
+          if(this.cards[j].value === i){
+            this.cards[j].url = this.picUrls[i];
+          }
+        }
+
+      }
+      this.timer = setInterval(() => {
+        this.elapsedTime += 1000;
+      }, 1000);
     }
   },
 
-  computed:{
+  computed: {
+    formattedElapsedTime() {
+      const date = new Date(null);
+      date.setSeconds(this.elapsedTime / 1000);
+      const utc = date.toUTCString();
+      return utc.substr(utc.indexOf(":") - 2, 8);
+    }
   },
 
   created(){
@@ -200,21 +237,22 @@ export default {
 </script>
 
 <style>
+*{
+  background-color: ivory;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 .card-container{
   display: flex;
   justify-content: center;
-  border: 1px solid black;
   flex-wrap: wrap;
   max-width:60rem;
-  min-height:451px;
   margin:auto;
 }
 

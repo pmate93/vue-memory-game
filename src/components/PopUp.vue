@@ -5,6 +5,7 @@
     <transition name="slide" appear>
     <div class="modal" v-if="showModal">
     <h1>Congratulations, You Won!</h1>
+    <div>Your playing time: {{formattedElapsedTime}}</div>
     <button class="button" @click="$emit('changeModal')">
         Close
     </button>
@@ -20,15 +21,13 @@ export default {
     name:'PopUp',
     emits: ['changeModal'],
     props:{
-      modal: Boolean
+      modal: Boolean,
+      formattedElapsedTime: String
     },
 
     computed:{
       showModal:{
         get() {return this.modal},
-        /* set(value) {
-        // some logic
-        this.$emit('update:name1', value) */
       }
     },
 
@@ -97,9 +96,13 @@ button:hover {
  
 }
 
+.modal div {
+  margin-bottom: 2%;
+}
+
 h1 {
   color: #222;
-  font-size: 32px;
+  font-size: 3vh;
   font-weight: 900;
   margin-bottom: 15px;
 }
