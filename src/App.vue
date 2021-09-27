@@ -27,7 +27,6 @@
 <script>
 import Card from './components/Card.vue';
 import PopUp from './components/PopUp.vue';
-
 import loading from './assets/loading.gif';
 import Header from './components/Header.vue';
 
