@@ -2,10 +2,10 @@
   <div class="container">
     <vue-flip v-model="isFlipped"  width="auto" height="auto">
               <template v-slot:front class="front">
-                <img :src="this.background">
+                <img :src="this.background" :draggable="false">
               </template>
               <template v-slot:back class="back">
-                <img :src="this.cardUrl">
+                <img :src="this.cardUrl" :draggable="false">
               </template>
     </vue-flip>
   </div>
