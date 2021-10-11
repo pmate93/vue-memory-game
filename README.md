@@ -1,4 +1,6 @@
-# memory-game
+# memory game with random images
+
+Hosting: https://pmate93.github.io/vue-memory-game/
 
 ## Project setup
 ```
